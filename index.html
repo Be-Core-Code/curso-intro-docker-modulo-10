@@ -4,11 +4,11 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+		<title>Módulo 10: Container Technology Overview</title>
 
 		<link rel="stylesheet" href="css/reset.css">
 		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+		<link rel="stylesheet" href="css/theme/sky.css">
 
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/monokai.css">
@@ -21,12 +21,66 @@
 			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
 			document.getElementsByTagName( 'head' )[0].appendChild( link );
 		</script>
+		<style>
+			#cc-license {
+							transform:  translate(-48%, 50vh) rotate(-90deg);
+							position: absolute;
+							top: 0px;
+							text-align: center;
+							font-family: inherit;
+							font-size: 0.3em;
+							width: 100%;
+							left: 0px;
+							z-index: 2;
+			}
+		</style>		
 	</head>
 	<body>
 		<div class="reveal">
+			<div id="cc-license">
+				<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">
+								<img alt="Creative Commons License" style="border-width:0; vertical-align: middle" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png"/>
+				</a>
+				This work is licensed under a
+				<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+			</div>
+
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+				<section>
+                                        <h2>Curso de introducción a Docker</h2>
+                                        <p><img src="images/horizontal-logo-monochromatic-white.png" height="75" class="plain" /></p>
+					<h4>Alfonso Alba García</h4>
+					<p>
+                                          <small>alfonso@alfonsoalba.com</small>
+					</p>
+                                        
+				</section>
+				<section data-markdown="slides/toc.md"
+					 data-separator="^------"
+					 data-separator-vertical="^\^\^\^\^\^\^"
+					 data-charset="utf8">
+				</section>
+         
+				<section id="crash-intro"
+					 data-markdown="slides/using-docker-to-play-the-slides.md"
+					 data-separator="^------"
+					 data-separator-vertical="^\^\^\^\^\^\^"
+					 data-charset="utf8">
+				</section>
+         
+				<section id="application-isolation"
+					 data-markdown="slides/application-isolation.md"
+					 data-separator="^------"
+					 data-separator-vertical="^\^\^\^\^\^\^"
+					 data-charset="utf8">
+				</section>
+         
+				<section id="security"
+					 data-markdown="slides/docker-security.md"
+					 data-separator="^------"
+					 data-separator-vertical="^\^\^\^\^\^\^"
+					 data-charset="utf8">
+				</section>
 			</div>
 		</div>
 
