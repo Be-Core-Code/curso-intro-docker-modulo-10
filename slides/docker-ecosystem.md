@@ -85,6 +85,7 @@ Docker continúa su cambio de paradigma (monolito -> componentes) liberando
 
 Es un demonio para Linux y Windows que gestiona el ciclo de vida completo de un contenedor:  transferencia y almacenamiento de imágenes, ejecución y supervisión del contenedor, etc
 
+^^^^^^
 
 ### Docker Ecosystem: 2017 - moby
 
