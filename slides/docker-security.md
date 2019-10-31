@@ -8,41 +8,12 @@
 
 ^^^^^^
 
-### Kernel namespaces
+### Seguridad del Kernel
 
 ```docker run``` crea un conjunto de namespaces y control groups sobre los que se ejecuta el contenedor
 
-*Son los encargados del aislamiento del contenedor*
-
-Los procesos que se ejecutan dentro del namespace de un contenedor *no pueden ver ni afectar* los procesos
-de otros contenedores o del host
-
-
 ^^^^^^
-
-#### Namespaces para un contenedor
-
-* PID namespace para aislamiento de procesos 
-* NET namespace para gestión de interfaces de red
-* IPC namespace para gestión del acceso a recursos IPC
-* MNT namespace para gestión de puntos de montaje
-* UTS namespace para gestión de nombres de host (hostname)
-* User namespace para gestión de usuarios y UIDs
-
-^^^^^^
-
-### Control Groups
-
-* Limitan los recursos utilizados por los procesos
-* Realizan algunas tareas de control de acceso, por ejemplo a dispositivos (devices)
-* Congelado (freezing) de grupos de procesos
-
-^^^^^^
-
-Incluir los diferentes cgroups y para qué sirven.
-
-
-
+#### Seguridad del Kernel
 
 &#x1F512;
 
@@ -100,26 +71,6 @@ El socket UNIX es el que usa Docker CLI para comunicarse con ```dockerd```
 
 ^^^^^^
 
-### Vectores de ataque sobre las imágenes
-
-Un atacante puede generar una imagen falsa e intentar colártela usando ```docker load```
-
-Para hacerlo, el atacante genera una imagen falsa que genera una colisión: tiene el mismo checksum que la imagen original.
-
-Para evitarlo, a partir de la versión 1.10.0 de docker, la imagen se almacena y se accede usando el checksum del contenido, lo que dificulta a un atacante causar una colisión
-
-^^^^^^
-
-### Docker Content Trust Signature Verification
-
-Es un mecanismo de protección adicional para garantizar la integridad de las imágenes
-
-Permite definir repositorios de imágenes confiables desde los que descargarlas.
-
-[Más información](https://docs.docker.com/engine/security/trust/content_trust/)
-
-^^^^^^
-
 ### A ```dockerd``` le gusta estar solo...
 
 Se recomienta que si un host va a ejecutar contenedores, este sólo corra el demonio
@@ -128,43 +79,22 @@ El resto de servicios deben ejecutarse como contenedores
 
 Se pueden mantener servicios como SSH y herramientas administrativas y/o de supervisión de procesos como NRPE. Todo lo demás debería ejecutarse como un contenedor
 
-
 ^^^^^^
 
-### Linux Kernel Capabilities (```libcap```)
-
-Los "Capabilities" del kernel de Linux convierten el problema binario “root/non-root” 
-en un sistema de control de acceso mucho más fino
-
-Por ejemplo: si le damos al usuario ```apache``` el "capability" ```net_bind_service``` ya no necesita ejecutarse como root
-
-notes:
-
-Antes de las "capabilities" sólo se podía acceder como root o como usuario. Por ejemplo,
-un servicio web se ejecuta como root, abre el puerto 80 (que es privilegiado) para escuchar en él
-y "suelta" los privilegios de root para ejecutarse como un usuario del sistema.
-
-Sólo necesita ser root para abrir el puerto 80 que es un puerto privilegiado
-
-El comando sudo nos permite hacer cosas como root pero de nuevo una vez sudo nos da acceso, ejecutamos
-el comando que sea como root, es decir, pasamos de no ser root a serlo para ejecutar sólo un comando.
-Con las capabilities, levantamos el servidor web sin necesidad de ser root en ningún momento.
-
-^^^^^^
-
-### ¿Necesitamos ejecutar los procesos de un contenedor como root?
+### ¿Necesitamos ejecutar los procesos dentro de un contenedor como root?
 
 La respuesta es NO en un 99,99999999999999999999999% de las veces
 
 ...bueno, quizás esté exagerando un poco con los 9s<!-- .element: class="fragment" data-fragment-index="1" -->
 
 ^^^^^^
+#### ¿Necesitamos ejecutar los procesos de un contenedor como root?
 
 En la máquina host, **SÍ** habrá servicios que necesitemos ejecutar como root, por ejemplo SSH, ```cron```, módulos del kernel, herramientas de administración y gestión de red, logs...
 
 ^^^^^^
 
-### Un contenedor es **diferente** 
+#### ¿Necesitamos ejecutar los procesos de un contenedor como root?
 
 * No necesitamos acceder por ssh al contenedor. Accedemos al host por ssh y usando ```docker exec``` accedemos al contenedor
 * Si la aplicación requiere el uso de ```cron``` este se puede ejecutar como un proceso de usuario personalizado para la aplicación en cuestión. **No se necesita un cron de sistema**
@@ -174,12 +104,9 @@ En la máquina host, **SÍ** habrá servicios que necesitemos ejecutar como root
 
 
 ^^^^^^
+#### ¿Necesitamos ejecutar los procesos de un contenedor como root?
 
-### En la mayoría de los casos NO hace falta root **para nada**
-
-Por eso, podemos ejecutar nuestros contenedores con un usuario root muy "capado"
-
-Por ejemplo...
+Si lo tenemos que hacer **podemos ejecutar nuestros contenedores con un usuario root muy "capado"**
 
 * no puede montar de dispositivos (```mount```)
 * no puede acceder a raw sockets (para evitar packet spoofing)
@@ -187,6 +114,7 @@ Por ejemplo...
 * no puede cargar módulos
 
 ^^^^^^
+#### ¿Necesitamos ejecutar los procesos de un contenedor como root?
 
 Así, incluso si un atacante obtiene permisos de root en el contenedor 
 
@@ -194,51 +122,19 @@ Así, incluso si un atacante obtiene permisos de root en el contenedor
 
 ^^^^^^
 
-### Ejecutar un contenedor sin ninguna capability
-
-```
-# docker run --rm -it --cap-drop ALL alpine sh
-```
-
-^^^^^^
-
-### Limitaciones
+#### Ejecutar un contenedor sin ninguna capability
 
 * A día de hoy, Docker no permite asignar y quitar "capabilites" a usuarios regulares, sólo se puede hacer a root
 
 ^^^^^^
 
-### Otras herramientas de seguridad del kernel
+### Vectores de ataque sobre las imágenes
 
-* Docker es compatible con TOMOYO, AppArmor, SELinux, GRSEC y herramientas similares
-  * [Ejemplos](https://docs.docker.com/engine/security/apparmor/) de cómo ejecutar un contenedor con AppArmor
-  * [RedHat](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/container_security_guide/docker_selinux_security_policy) incluye una política para SELinux para asegurar contenedores y máquinas virtuales
+Un atacante puede generar una imagen falsa e intentar colártela usando ```docker load```
 
-notes:
+Para hacerlo, el atacante genera una imagen falsa que genera una colisión: tiene el mismo checksum que la imagen original.
 
-Enlace adicional: https://www.mankier.com/8/docker_selinux
-
-^^^^^^
-
-### Otras herramientas de seguridad del kernel
-
-* A partir de Docker 1.10 ```dockerd``` soporta "User Namespaces"
-* Esto permite mapear el usuario root dentro del contenedor a un usuario con id distinto de cero **fuera del contenedor**
-* Así podemos mitigar ataques en los que el atacante consiga escapar del contenedor
-* Más información:
-  * [Configuración de ```dockerd```](https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-user-namespace-options)
-  * [Este post](https://integratedcode.us/2015/10/13/user-namespaces-have-arrived-in-docker/)
-
-^^^^^^
-### Herramientas de seguridad para docker
-
-* [Docker Bench for Securiry](https://github.com/docker/docker-bench-security) 
-  Script para testar multitud de buenas prácticas y configuraciones en producción
-* [Clair](https://coreos.com/clair/docs/latest/) Análisis estático de vulnerabilidades
-* [Cilium](https://github.com/cilium/cilium) Seguridad adicional de red 
-  (Layer 7)
-* [Anchore](https://github.com/anchore/anchore-engine) Análisis de imágenes
-* [lynis](https://cisofy.com/lynis/) / [lynis-docker](https://cisofy.com/lynis/plugins/docker/)
+Para evitarlo, a partir de la versión 1.10.0 de docker, la imagen se almacena y se accede usando el checksum del contenido, lo que dificulta a un atacante causar una colisión
 
 ^^^^^^
 
@@ -311,6 +207,43 @@ touch: x: Read-only file system
 > docker run -v $(pwd)/secrets:/secrets:ro alpine touch secrets/x
 touch: secrets/x: Read-only file system
 ```
+
+^^^^^^
+
+### Herramientas de seguridad para docker
+
+* [Docker Bench for Securiry](https://github.com/docker/docker-bench-security) 
+  Script para testar multitud de buenas prácticas y configuraciones en producción
+* [Clair](https://coreos.com/clair/docs/latest/) Análisis estático de vulnerabilidades
+* [Cilium](https://github.com/cilium/cilium) Seguridad adicional de red 
+  (Layer 7)
+* [Anchore](https://github.com/anchore/anchore-engine) Análisis de imágenes
+* [lynis](https://cisofy.com/lynis/) / [lynis-docker](https://cisofy.com/lynis/plugins/docker/)
+
+
+^^^^^^
+
+### Otras herramientas de seguridad del kernel
+
+* Docker es compatible con TOMOYO, AppArmor, SELinux, GRSEC y herramientas similares
+  * [Ejemplos](https://docs.docker.com/engine/security/apparmor/) de cómo ejecutar un contenedor con AppArmor
+  * [RedHat](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/container_security_guide/docker_selinux_security_policy) incluye una política para SELinux para asegurar contenedores y máquinas virtuales
+
+notes:
+
+Enlace adicional: https://www.mankier.com/8/docker_selinux
+
+^^^^^^
+
+### Otras herramientas de seguridad del kernel
+
+* A partir de Docker 1.10 ```dockerd``` soporta "User Namespaces"
+* Esto permite mapear el usuario root dentro del contenedor a un usuario con id distinto de cero **fuera del contenedor**
+* Así podemos mitigar ataques en los que el atacante consiga escapar del contenedor
+* Más información:
+  * [Configuración de ```dockerd```](https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-user-namespace-options)
+  * [Este post](https://integratedcode.us/2015/10/13/user-namespaces-have-arrived-in-docker/)
+
 
 ^^^^^^
 

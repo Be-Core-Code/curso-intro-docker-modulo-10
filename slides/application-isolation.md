@@ -113,11 +113,69 @@ PID   USER     TIME   COMMAND
 As you can see, instead of emulating an entire OS (running 100+ processes), the container is told that it’s processes (sh and ps in this case) are the only one in this environment. In theory this prevents a malicious attack from inside the container from invading the host OS.
 
 ^^^^^^
+#### Control Groups
 
-La forma de "mentir" es utilizar Control Group ([cgroups](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/resource_management_guide/index)) del kernel de Linux.
+¿Qué herramientas nos da el Kernel de Linux para aislar los procesos?
+
+* Control Groups ([cgroups](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/resource_management_guide/index)) 
+  encargados de limitar los recursos utilizados por los procesos
 
 notes:
 [https://devopsbootcamp.osuosl.org/application-isolation.html#container-technologies](https://devopsbootcamp.osuosl.org/application-isolation.html#container-technologies)
 
 CGroups
 A Linux kernel-level technology that name-spaces processes. It performs many functions, but it’s used by container engines to convince a process that it’s running in its own environment. This is what isolates a process from other processes, if they think they’re the only thing running they can’t tamper with the host OS.
+
+#### Control Groups
+
+* Limitan los recursos utilizados por los procesos
+* Realizan algunas tareas de control de acceso, por ejemplo a dispositivos (devices)
+* Congelado (freezing) de grupos de procesos
+
+^^^^^^
+
+#### Namespaces
+
+* Kernel [namespaces](http://man7.org/linux/man-pages/man7/namespaces.7.html) 
+  *Son los encargados del aislamiento del contenedor*
+
+Los procesos que se ejecutan dentro del namespace de un contenedor *no pueden ver ni afectar* los procesos
+de otros contenedores o del host
+
+
+^^^^^^
+
+#### Namespaces
+
+* PID namespace para aislamiento de procesos 
+* NET namespace para gestión de interfaces de red
+* IPC namespace para gestión del acceso a recursos IPC
+* MNT namespace para gestión de puntos de montaje
+* UTS namespace para gestión de nombres de host (hostname)
+* User namespace para gestión de usuarios y UIDs
+
+^^^^^^
+
+### Linux Kernel Capabilities (```libcap```)
+
+Los ["capabilities"](http://man7.org/linux/man-pages/man7/capabilities.7.html) 
+del kernel de Linux convierten el problema binario “root/non-root” 
+en un sistema de control de acceso mucho más fino
+
+Por ejemplo: si le damos al usuario ```apache``` el "capability" ```net_bind_service``` ya no necesita ejecutarse como root
+
+notes:
+
+Antes de las "capabilities" sólo se podía acceder como root o como usuario. Por ejemplo,
+un servicio web se ejecuta como root, abre el puerto 80 (que es privilegiado) para escuchar en él
+y "suelta" los privilegios de root para ejecutarse como un usuario del sistema.
+
+Sólo necesita ser root para abrir el puerto 80 que es un puerto privilegiado
+
+El comando sudo nos permite hacer cosas como root pero de nuevo una vez sudo nos da acceso, ejecutamos
+el comando que sea como root, es decir, pasamos de no ser root a serlo para ejecutar sólo un comando.
+Con las capabilities, levantamos el servidor web sin necesidad de ser root en ningún momento.
+
+
+
+
